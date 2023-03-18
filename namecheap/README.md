@@ -3,6 +3,9 @@
 # Table of Contents
 
 - [Deployment](#deployment)
+- [Namecheap API Access](#namecheap-api-access)
+    - [Enable API Access](#enable-api-access)
+    - [Whitelist IP](#whitelist-ip)
 
 # Deployment
 
@@ -25,3 +28,17 @@ terraform plan -var-file=namecheap.tfvars
 ```shell
 terraform apply -var-file=namecheap.tfvars
 ```
+
+# Namecheap API Access
+
+Namecheap API access needs to be enabled before configuring domain records with Terraform is possible.
+
+API access is granted by Namecheap if the prerequisites listed in this [article](https://www.namecheap.com/support/knowledgebase/article.aspx/10502/2208/namecheap-terraform-provider/) are met.
+
+## Enable API Access
+
+API access can be toggled on in the Namecheap account by navigating to: `Profile --> Tools --> Namecheap API Access`.
+
+Toggling on API access will generate an API key.
+
+## Whitelist IP
