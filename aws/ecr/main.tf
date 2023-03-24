@@ -3,7 +3,7 @@ resource "aws_ecr_repository" "talelio_postgresql" {
 }
 
 resource "docker_image" "talelio_postgresql" {
-  name = "talelio-postgresql"
+  name = "${aws_ecr_repository.talelio_postgresql.repository_url}:latest"
 
   build {
     context    = "${path.root}/postgresql"
@@ -24,4 +24,8 @@ resource "docker_image" "talelio_postgresql" {
       S3_POSTGRES_BACKUPS_PREFIX = var.s3_postgres_backups_prefix
     }
   }
+}
+
+resource "docker_registry_image" "talelio_postgresql" {
+  name = docker_image.talelio_postgresql.name
 }
