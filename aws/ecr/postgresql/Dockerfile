@@ -1,4 +1,9 @@
-FROM postgres:14.7-alpine
+FROM postgres:15.2-alpine
+
+# Pass the path to restore_postgres_db.sh
+# as a build arg so this Dockerfile finds
+# it in the build context.
+ARG RESTORE_DB_SCRIPT
 
 ARG POSTGRES_USER
 ARG POSTGRES_PASSWORD
@@ -16,7 +21,7 @@ ENV AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
 ENV S3_BACKUPS_BUCKET=${S3_BACKUPS_BUCKET}
 ENV S3_POSTGRES_BACKUPS_PREFIX=${S3_POSTGRES_BACKUPS_PREFIX}
 
-ADD restore_postgre_db.sh /docker-entrypoint-initdb.d/
+COPY ${RESTORE_DB_SCRIPT} /docker-entrypoint-initdb.d/
 
 RUN apk add --no-cache aws-cli
 
