@@ -9,7 +9,7 @@
 
 # About the Service
 
-[ECR](https://aws.amazon.com/ecr/) is Docker image repositories on AWS. Each image has its separate repository with different versions of a given image.
+[Amazon ECR](https://aws.amazon.com/ecr/) are Docker image repositories on AWS. Each image has its separate repository with different versions of a given image.
 
 # Deployment
 
@@ -20,7 +20,7 @@ Before running the `terraform plan` and/or `terraform apply` commands, ensure th
 | postgres_user              | \<talel.io postgres user\>                                   |
 | postgres_password          | \<talel.io postgres password\>                               |
 | postgres_db                | \<talel.io postgres db\>                                     |
-| aws_access_key_id          | \<access key id for user with talel.io aws permissions \>    |
+| aws_access_key_id          | \<access key id for user with talel.io aws permissions\>     |
 | aws_secret_access_key      | \<secret access key for user with talel.io aws permissions\> |
 | s3_backups_bucket          | \<s3 backups bucket name\>                                   |
 | s3_postgres_backups_prefix | \<s3 postgres backups subfolder name\>                       |
