@@ -71,6 +71,6 @@ AWS Elastic IP (EIP) provides a fixed public IPv4 IP address that will stay allo
 
 > ⚠️ The `aws_eip` Terraform resource is allocating an EIP in Amazon's pool of IPv4 addresses without associating it with any instance.
 
-[^1]: A availability zone is a data center in a cluster of data centers. Each region contains two or more availability zones.
+[^1]: An availability zone is a data center in a cluster of data centers. Each region contains two or more availability zones.
 
 [^2]: EIP is free of charge when attached to a running instance, if these conditions are not met additional [charges](https://aws.amazon.com/ec2/pricing/on-demand/#Elastic_IP_Addresses) apply.

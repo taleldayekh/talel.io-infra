@@ -10,7 +10,6 @@ resource "docker_image" "talelio_postgresql" {
     dockerfile = "Dockerfile"
     no_cache   = true
 
-    #! Required when building the image on Apple Silicon
     platform = "linux/amd64"
 
     build_args = {

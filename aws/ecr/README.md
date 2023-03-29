@@ -41,6 +41,8 @@ terraform apply -var-file=ecr.tfvars
 
 # Dockerfiles
 
+> ⚠️ When building Docker images on Apple Silicon for running on ECS the `platform = "linux/amd64"` flag needs to be defined in the `docker_image` Terraform resource.
+
 ## PostgreSQL
 
 The PostgreSQL Dockerfile runs a Dockerized PostgreSQL database with the credentials for talel.io.
