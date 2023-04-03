@@ -6,77 +6,49 @@ module "iam" {
   source = "../iam"
 }
 
-resource "aws_key_pair" "talelio_key_pair" {
-  key_name   = "talelio-key"
-  public_key = file("~/.ssh/aws-talelio-key.pub")
+resource "aws_key_pair" "key_pair" {
+  public_key = file(var.aws_public_key_path)
 }
 
-resource "aws_launch_template" "launch_template" {
-  image_id               = "ami-05e7fa5a3b6085a75"
-  instance_type          = "t2.micro"
-  # vpc_security_group_ids = [module.vpc.public_security_group_id]
-  key_name               = aws_key_pair.talelio_key_pair.id 
- 
-  # TODO: Move to dedicated script file
-  user_data = filebase64("cluster.sh")
+resource "aws_instance" "ec2_instance" {
+  #! Has to be an ECS compatible Amazon Machine Image
+  ami                  = "ami-05e7fa5a3b6085a75"
+  instance_type        = "t2.micro"
+  key_name             = aws_key_pair.key_pair.id
+  user_data            = filebase64("talelio-ec2-setup.sh")
+  security_groups      = [module.vpc.public_security_group_id]
+  subnet_id            = module.vpc.public_subnet_id
+  iam_instance_profile = module.iam.ec2_instance_profile
 
-  iam_instance_profile {
-    name = module.iam.instance_profile_name
-  }
-
-  network_interfaces {
-    security_groups = [module.vpc.public_security_group_id]
-    associate_public_ip_address = true
-    subnet_id = module.vpc.public_subnet_id
+  tags = {
+    Name = "talelio-ec2-instance"
   }
 }
 
-resource "aws_autoscaling_group" "asg" {
-  name                = "talelio-asg"
-  vpc_zone_identifier = [module.vpc.public_subnet_id]
-  desired_capacity    = 1
-  min_size            = 1
-  max_size            = 2
-  health_check_type   = "EC2"
-
-  launch_template {
-    id = aws_launch_template.launch_template.id
-  }
+resource "aws_eip_association" "talelio_ec2_eip_association" {
+  instance_id   = aws_instance.ec2_instance.id
+  allocation_id = module.vpc.public_elastic_ip
 }
 
 resource "aws_ecs_cluster" "cluster" {
   name = "talelio-cluster"
 }
 
-# ?: Should there be one task def per container? AWS do allow for multiple
-# ?: containers to be defined in a task definition, but what happens if we
-# ?: only want to update one of those containers?
-
-resource "aws_ecs_task_definition" "task_definition" {
-  family       = "talelio"
+resource "aws_ecs_task_definition" "persistent_storage" {
+  family       = "talelio-persistent-storage"
   network_mode = "bridge"
 
-  # TODO: Replace image wiht ECR image
   container_definitions = jsonencode([
     {
-      name      = "nginx"
-      image     = "nginx:1.23.3-alpine"
-      cpu       = 10
-      memory    = 256
+      name      = "talelio-redis"
+      image     = "redis:7.0.10-alpine"
       essential = true
       portMappings = [
         {
-          containerPort = 80
-          hostPort      = 80
+          containerPort = 6379
+          hostPort      = 6379
         }
       ]
     }
   ])
-}
-
-resource "aws_ecs_service" "service" {
-  name            = "talelio"
-  cluster         = "talelio-cluster"
-  task_definition = aws_ecs_task_definition.task_definition.arn
-  desired_count   = 1
 }
