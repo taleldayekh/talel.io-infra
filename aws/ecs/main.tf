@@ -6,6 +6,10 @@ module "iam" {
   source = "../iam"
 }
 
+module "ecr" {
+  source = "../ecr"
+}
+
 resource "aws_key_pair" "key_pair" {
   public_key = file(var.aws_public_key_path)
 }
@@ -38,10 +42,16 @@ resource "aws_ecs_task_definition" "persistent_storage" {
   family       = "talelio-persistent-storage"
   network_mode = "bridge"
 
+  volume {
+    name      = "postgresql"
+    host_path = "/var/lib/talelio-postgresql"
+  }
+
   container_definitions = jsonencode([
     {
       name      = "talelio-redis"
       image     = "redis:7.0.10-alpine"
+      memory    = 128
       essential = true
       portMappings = [
         {
@@ -49,6 +59,64 @@ resource "aws_ecs_task_definition" "persistent_storage" {
           hostPort      = 6379
         }
       ]
+    },
+    {
+      name = "talelio-postgresql"
+      #TODO: Retrieve image uri from ECR output
+      image     = ""
+      memory    = 384
+      essential = true
+      portMappings = [
+        {
+          containerPort = 5432
+          hostPort      = 5432
+        }
+      ]
+      mountPoints = [
+        {
+          sourceVolume  = "postgresql"
+          containerPath = "/var/lib/postgresql/data"
+        }
+      ]
     }
   ])
+}
+
+resource "aws_ecs_task_definition" "reverse_proxy" {
+  family       = "talelio-reverse-proxy"
+  network_mode = "bridge"
+
+  container_definitions = jsonencode([
+    {
+      name = "talelio-nginx"
+      #TODO: Retrieve image uri from ECR output
+      image     = "nginx:1.23.3-alpine"
+      memory    = 128
+      essential = true
+      portMappings = [
+        {
+          containerPort = 80
+          hostPort      = 80
+        },
+        {
+          containerPort = 443
+          hostPort      = 443
+        }
+      ]
+    }
+  ])
+}
+
+resource "aws_ecs_service" "persistent_storage_service" {
+  name            = "talelio-persistent-storage"
+  cluster         = "talelio-cluster"
+  task_definition = aws_ecs_task_definition.persistent_storage.arn
+  desired_count   = 1
+}
+
+resource "aws_ecs_service" "reverse_proxy_service" {
+  name            = "talelio-reverse-proxy"
+  cluster         = "talelio-cluster"
+  task_definition = aws_ecs_task_definition.reverse_proxy.arn
+  desired_count   = 1
 }
