@@ -3,9 +3,9 @@
 # Table of Contents
 
 - [About the Service](#about-the-service)
-    - [Internet Gateway and Route Table](#internet-gateway-and-route-table)
-    - [Security Groups](#security-groups)
-    - [Elastic IP](#elastic-ip)
+  - [Internet Gateway and Route Table](#internet-gateway-and-route-table)
+  - [Security Groups](#security-groups)
+  - [Elastic IP](#elastic-ip)
 - [Deployment](#deployment)
 
 # About the Service
@@ -47,5 +47,4 @@ AWS Elastic IP (EIP) provides a fixed public IPv4 address that will stay allocat
 Run the `terraform plan` command followed by `terraform apply` to set up the talel.io VPC with its subnet, internet gateway and route table as well as allocating a public IPv4 address.
 
 [^1]: An availability zone is a data center in a cluster of data centers. Each region contains two or more availability zones.
-
 [^2]: EIP is free of charge when attached to a running instance, if these conditions are not met additional [charges](https://aws.amazon.com/ec2/pricing/on-demand/#Elastic_IP_Addresses) apply.
