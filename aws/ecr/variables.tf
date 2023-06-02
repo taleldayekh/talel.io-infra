@@ -1,7 +1,9 @@
 variable "talelio_repositories" {
   type = list(string)
   default = [
+    "talelio-backend-api",
     "talelio-postgresql",
-    "talelio-backend-api"
+    "talelio-redis",
+    "talelio-nginx"
   ]
 }

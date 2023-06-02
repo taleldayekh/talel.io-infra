@@ -16,8 +16,7 @@ resource "aws_ecr_lifecycle_policy" "talelio_repository_lifecycle" {
                 "selection": {
                     "tagStatus": "any",
                     "countType": "imageCountMoreThan",
-                    "countNumber": 1,
-                    "countUnit": "image"
+                    "countNumber": 2
                 },
                 "action": {
                     "type": "expire"
@@ -28,4 +27,4 @@ resource "aws_ecr_lifecycle_policy" "talelio_repository_lifecycle" {
     EOF
 }
 
-resource "docker_image" "talelio_postgresql" {}
+# resource "docker_image" "talelio_postgresql" {}
