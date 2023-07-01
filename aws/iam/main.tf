@@ -6,3 +6,13 @@ resource "aws_iam_role" "ec2_role" {
     Name = "talelio-ec2-role"
   }
 }
+
+resource "aws_iam_role_policy_attachment" "policy_document" {
+  role       = aws_iam_role.ec2_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
+}
+
+resource "aws_iam_instance_profile" "ec2_instance_profile" {
+  name = "talelio-ec2-instance-profile"
+  role = aws_iam_role.ec2_role.name
+}
