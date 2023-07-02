@@ -76,3 +76,9 @@ resource "aws_security_group" "public_sg" {
     Name = "talelio-public-sg"
   }
 }
+
+resource "aws_eip" "eip" {
+  tags = {
+    Name = "talelio-eip"
+  }
+}
