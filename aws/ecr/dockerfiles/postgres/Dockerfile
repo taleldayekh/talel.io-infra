@@ -27,7 +27,8 @@ ENV S3_BACKUPS_BUCKET=${S3_BACKUPS_BUCKET}
 ENV S3_POSTGRES_BACKUPS_PREFIX=${S3_POSTGRES_BACKUPS_PREFIX}
 
 COPY ${PATH_TO_ENTRYPOINT_SCRIPT} /usr/local/bin/entrypoint.sh
-# ! Must be placed here to run SQL scripts
+# Restore DB script must be put at this
+# location for executing SQL on startup.
 COPY ${PATH_TO_RESTORE_DB_SCRIPT} /docker-entrypoint-initdb.d/
 COPY ${PATH_TO_BACKUP_DB_SCRIPT} /usr/local/bin/backup_db.sh
 
@@ -38,7 +39,7 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 RUN chmod +x /docker-entrypoint-initdb.d/restore_postgres_db.sh
 RUN chmod +x /usr/local/bin/backup_db.sh
 
-# Create cron job for daily database backups
+# Create cron job for nightly database backups
 RUN echo '0 3 * * * /usr/local/bin/backup_db.sh' > /etc/crontabs/root
 
 EXPOSE 5234

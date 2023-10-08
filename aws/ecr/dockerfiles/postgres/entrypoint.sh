@@ -1,12 +1,5 @@
 #!/bin/sh
 
-crond
+crond -1 2 -f &
 
-
-# #!/bin/sh
-
-# # Start the cron service in the background
-# crond -l 2 -f &
-
-# # Start PostgreSQL
-# exec docker-entrypoint.sh postgres
+exec docker-entrypoint.sh postgres
