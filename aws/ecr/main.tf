@@ -1,3 +1,4 @@
+# Create ECR repositories and define lifecycle policies
 resource "aws_ecr_repository" "talelio_repositories" {
   for_each = toset(var.talelio_repositories)
   name     = each.value
@@ -27,8 +28,8 @@ resource "aws_ecr_lifecycle_policy" "talelio_repository_lifecycle" {
     EOF
 }
 
+# Upload Docker images to repositories
 resource "docker_image" "talelio_postgresql" {
-  # TODO: Understand image naming
   name = "talelio-postgresql"
 
   build {
@@ -38,6 +39,9 @@ resource "docker_image" "talelio_postgresql" {
     platform   = "linux/amd64"
 
     build_args = {
+      PATH_TO_ENTRYPOINT_SCRIPT  = "${path.root}/entrypoint.sh"
+      PATH_TO_RESTORE_DB_SCRIPT  = "${path.root}/restore_db.sh"
+      PATH_TO_BACKUP_DB_SCRIPT   = "${path.root}/backup_db.sh"
       POSTGRES_USER              = var.postgres_user
       POSTGRES_PASSWORD          = var.postgres_password
       POSTGRES_DB                = var.postgres_db
@@ -45,7 +49,6 @@ resource "docker_image" "talelio_postgresql" {
       AWS_SECRET_ACCESS_KEY      = var.aws_secret_access_key
       S3_BACKUPS_BUCKET          = var.s3_backups_bucket
       S3_POSTGRES_BACKUPS_PREFIX = var.s3_postgres_backups_prefix
-      RESTORE_DB_SCRIPT_PATH     = "${path.root}/restore_postgres_backup.sh"
     }
   }
 }
