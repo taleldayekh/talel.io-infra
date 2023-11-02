@@ -2,21 +2,57 @@
 
 # Table of Contents
 
+- [About the Service](#about-the-service)
+- [Deployment Notes](#deployment-notes)
 - [Dockerfiles](#dockerfiles)
-  - [PostgreSQL](#postgresql)
+  - [Postgres](#postgres)
   - [NGINX](#nginx)
+
+# About the Service
+
+# Deployment Notes
+
+**Plan**
+
+```shell
+terraform plan -var-file=ecr.tfvars
+```
+
+**Apply**
+
+```shell
+terraform apply -var-file=ecr.tfvars
+```
 
 # Dockerfiles
 
-## PostgreSQL
+## Postgres
+
+PostgreSQL container for the talelio database.
+
+When container spins up, the `restore_db.sh` script is executed which checks for and recovers the latest database backup from S3.
+
+A cron job is executing the `backup_db.sh` script nightly for creating database backup dumps to S3.
+
+**Expected build args:**
+
+```shell
+PATH_TO_ENTRYPOINT_SCRIPT
+PATH_TO_RESTORE_DB_SCRIPT
+PATH_TO_BACKUP_DB_SCRIPT
+POSTGRES_USER
+POSTGRES_PASSWORD
+POSTGRES_DB
+AWS_ACCESS_KEY_ID
+AWS_SECRET_ACCESS_KEY
+S3_BACKUPS_BUCKET
+S3_POSTGRES_BACKUPS_PREFIX
+```
 
 ## NGINX
 
-Before building and pushing the `nginx` image:
+**Before pushing the NGINX image:**
 
-- Update `proxy_pass` in the [`talelio.conf`](https://github.com/taleldayekh/talel.io-infra/blob/bc34b6e915c8dd81a12b33724ec5443d2a38c9c0/aws/ecr/dockerfiles/nginx/talelio.conf#L6) NGINX config with the private IPv4 address of the EC2 instance that will run the container.
-- Update the `certbot` command in the [`entrypoint.sh`](https://github.com/taleldayekh/talel.io-infra/blob/bc34b6e915c8dd81a12b33724ec5443d2a38c9c0/aws/ecr/dockerfiles/nginx/entrypoint.sh#L3) script with a valid email address.
+- Update `proxy_pass` in the `talelio.conf` NGINX config with the private IPv4 address of the EC2 instance that will be running the container.
 
-<!-- Repositories must exist before the lifecycle policy is added, comment out code and make sure they exists first
-
-When running on ECR the AWS credentials are automatically made available therefore no values need to be passed for them. -->
+- Update the `certbot` command in the `entrypoint.sh` script with a valid email address.
