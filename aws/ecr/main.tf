@@ -1,13 +1,14 @@
 # Create ECR repositories and define lifecycle policies
 resource "aws_ecr_repository" "talelio_repositories" {
-  for_each = toset(var.talelio_repositories)
-  name     = each.value
+  for_each     = toset(var.talelio_repositories)
+  name         = each.value
+  force_delete = true
 }
 
 resource "aws_ecr_lifecycle_policy" "talelio_repository_lifecycle" {
   for_each   = toset(var.talelio_repositories)
   repository = each.key
-  depends_on = [aws_ecr_repository.talelio_repositories[each.key]]
+  depends_on = [aws_ecr_repository.talelio_repositories]
 
   policy = <<EOF
     {
