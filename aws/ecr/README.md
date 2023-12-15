@@ -10,6 +10,8 @@
 
 # About the Service
 
+TBD
+
 # Deployment Notes
 
 **Plan**
@@ -22,6 +24,12 @@ terraform plan -var-file=ecr.tfvars
 
 ```shell
 terraform apply -var-file=ecr.tfvars
+```
+
+**Destroy**
+
+```shell
+terraform destroy -var-file=ecr.tfvars
 ```
 
 # Dockerfiles
